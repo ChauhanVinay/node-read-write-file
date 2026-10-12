@@ -6,6 +6,11 @@ const server = http.createServer((req, res) => {
     const method = req.method;
 
     if(url === '/'){
+
+        //Read stored message from the file 'message'
+       fs.readFile('message', 'utf8', (err, data) => {
+            const existingMessages = err || !data ? 'No messages yet' : decodeURIComponent(data.replace(/\+/g, ' '));
+
         res.setHeader('Content-type', 'text/html');
         return res.end(`
             <html>
@@ -19,6 +24,9 @@ const server = http.createServer((req, res) => {
               </body>
             </html>
             `);
+
+        });
+        return;
     }
 
     if(url === '/message' && method === 'POST'){
