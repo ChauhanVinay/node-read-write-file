@@ -1,60 +1,12 @@
 const http = require('http');
-const fs = require('fs');
+const routes = require("./routes");
 
-const server = http.createServer((req, res) => {
-    const url = req.url;
-    const method = req.method;
+// If using Way 1:
+const server = http.createServer(routes);
 
-    if(url === '/'){
-
-        //Read stored message from the file 'message'
-       fs.readFile('message', 'utf8', (err, data) => {
-            const existingMessages = err || !data ? 'No messages yet' : decodeURIComponent(data.replace(/\+/g, ' '));
-
-        res.setHeader('Content-type', 'text/html');
-        return res.end(`
-            <html>
-              <head><title>Task 1</title><head>
-              <body>
-                 <form action="/message"method="POST"> 
-                 <label>Enter Message:</label>
-                 <input type="text" name="message">
-                 <button type="submit">Add</button>
-                 </form>
-              </body>
-            </html>
-            `);
-
-        });
-        return;
-    }
-
-    if(url === '/message' && method === 'POST'){
-        const body = [];
-
-        req.on('data', (chunk) => {
-            body.push(chunk);
-        });
-
-        return req.on('end', () => {
-            const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split('=')[1];
-
-            //Write to file message
-            fs.writeFile('message', message, (err) => {
-                if(err) console.error(err);
-                res.statusCode = 302;
-                res.setHeader('Location', '/');
-                return res.end();
-            });
-        });
-    }
-
-        res.statusCode = 404;
-        res.setHeader('Content-type', 'text/html');
-        res.end('<h1>Page Not Found</h1>');
-});
+// If using Way 2 or Way 3:
+// const server = http.createServer(routes.handler);
 
 server.listen(3000, () => {
-    console.log('Server running onport 3000');
+    console.log('Server running on port 3000');
 });
